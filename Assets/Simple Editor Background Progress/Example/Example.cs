@@ -19,15 +19,12 @@ namespace Assets.SimpleBackgroundProgress
 
             _progressHelper.AddChild(newCommandInfo);
 
+#pragma warning disable CS4014
             StabJob(newCommandInfo, 2);
+#pragma warning restore CS4014
         }
 
-        public void CancelSomeProgress()
-        {
-            _progressHelper.Progresses.FirstOrDefault()?.TaskProgressInfo.Cancel();
-        }
-
-        public void StartProgress()
+        public void StartMultiProgress()
         {
             var commandsInfo = new List<TaskProgressInfo>();
 
@@ -35,16 +32,32 @@ namespace Assets.SimpleBackgroundProgress
 
             _progressHelper = new ProgressHelper(commandsInfo);
             
-            StabJob(commandsInfo[0], 1);
+#pragma warning disable CS4014
+            StabJob(commandsInfo[0]);
             StabJob(commandsInfo[1], 2);
             StabJob(commandsInfo[2], 3);
-
-            var anotherProgressHelper = new ProgressHelper("another uncancellable Progress");
-
-            StabJob(anotherProgressHelper.Progresses[0].TaskProgressInfo, 1);
+#pragma warning restore CS4014
         }
 
-        private static async Task StabJob(TaskProgressInfo taskProgressesInfo, int delay)
+        public void StartUncancellableProgress()
+        {
+#pragma warning disable CS4014
+            var anotherProgressHelper = new ProgressHelper("Uncancellable Progress");
+
+            StabJob(anotherProgressHelper.Progresses[0].TaskProgressInfo);
+#pragma warning restore CS4014
+        }
+
+        public void StartCancellableProgress()
+        {
+#pragma warning disable CS4014
+            var anotherProgressHelper = new ProgressHelper(new TaskProgressInfo("Cancellable Progress", "", new CancellationTokenSource()));
+
+            StabJob(anotherProgressHelper.Progresses[0].TaskProgressInfo);
+#pragma warning restore CS4014
+        }
+
+        private static async Task StabJob(TaskProgressInfo taskProgressesInfo, int delay = 1)
         {
             await Task.Run(() =>
             {
@@ -58,6 +71,40 @@ namespace Assets.SimpleBackgroundProgress
                 }
             }, taskProgressesInfo.CancellationTokenSource?.Token ?? new CancellationToken());
         }
+
+        public void CancelSomeProgress()
+        {
+            var progressInfo = _progressHelper.Progresses.FirstOrDefault();
+
+            if (progressInfo != null)
+            {
+                _progressHelper.Progresses.FirstOrDefault()?.TaskProgressInfo.Cancel();
+            }
+            else
+            {
+                ShowUsage();
+            }
+        }
+
+        public void FailSomeProgress()
+        {
+            var progressInfo = _progressHelper.Progresses.FirstOrDefault();
+
+            if (progressInfo != null)
+            {
+                progressInfo.TaskProgressInfo.Status = Progress.Status.Failed;
+                progressInfo.TaskProgressInfo.Cancel();
+            }
+            else
+            {
+                ShowUsage();
+            }
+        }
+
+        private static void ShowUsage()
+        {
+            Debug.LogWarning("To do this start multi Progress first!");
+        }
     }
 
     [CustomEditor(typeof(Example))]
@@ -70,9 +117,19 @@ namespace Assets.SimpleBackgroundProgress
             var ttsSettings = (Example)target;
             var buttonStyle = new GUIStyle(GUI.skin.button) { fontStyle = FontStyle.Bold, fixedHeight = 30 };
             
-            if (GUILayout.Button("Start progress", buttonStyle))
+            if (GUILayout.Button("Start multi progresses", buttonStyle))
             {
-                ttsSettings.StartProgress();
+                ttsSettings.StartMultiProgress();
+            }
+
+            if (GUILayout.Button("Start uncancellable progresses", buttonStyle))
+            {
+                ttsSettings.StartUncancellableProgress();
+            }
+
+            if (GUILayout.Button("Start cancellable progresses", buttonStyle))
+            {
+                ttsSettings.StartCancellableProgress();
             }
 
             if (GUILayout.Button("Add some progress", buttonStyle))
@@ -83,6 +140,11 @@ namespace Assets.SimpleBackgroundProgress
             if (GUILayout.Button("Cancel some created progress", buttonStyle))
             {
                 ttsSettings.CancelSomeProgress();
+            }
+
+            if (GUILayout.Button("Fail some created progress", buttonStyle))
+            {
+                ttsSettings.FailSomeProgress();
             }
         }
     }

@@ -1,13 +1,16 @@
+using System;
 using System.Threading;
 using JetBrains.Annotations;
+using UnityEditor;
 
 namespace Assets.SimpleBackgroundProgress.Scripts
 {
-    public class TaskProgressInfo
+    public class TaskProgressInfo : IProgressProperty
     {
         public string Name;
         public string Cmd;
         public int Progress;
+        public Progress.Status Status;
 
         [CanBeNull] public CancellationTokenSource CancellationTokenSource;
 
@@ -26,5 +29,21 @@ namespace Assets.SimpleBackgroundProgress.Scripts
 
             return true;
         }
+
+        public void Set(int value)
+        {
+            Progress = value;
+        }
+
+        public int Get()
+        {
+            return Progress;
+        }
+    }
+
+    public interface IProgressProperty
+    {
+        public void Set(int value);
+        public int Get();
     }
 }
