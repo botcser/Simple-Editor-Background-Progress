@@ -46,7 +46,7 @@ namespace Assets.SimpleBackgroundProgress
 #pragma warning disable CS4014
             var anotherProgressHelper = new ProgressHelper("Uncancellable Progress");
 
-            StabJob(anotherProgressHelper.Progresses[0].TaskProgressInfo);
+            StabJob(anotherProgressHelper.Progresses[0].TaskProgressInfo, 4);
 #pragma warning restore CS4014
         }
 
@@ -55,7 +55,7 @@ namespace Assets.SimpleBackgroundProgress
 #pragma warning disable CS4014
             var anotherProgressHelper = new ProgressHelper(new TaskProgressInfo("Cancellable Progress", "", new CancellationTokenSource()));
 
-            StabJob(anotherProgressHelper.Progresses[0].TaskProgressInfo);
+            StabJob(anotherProgressHelper.Progresses[0].TaskProgressInfo, 4);
 #pragma warning restore CS4014
         }
 

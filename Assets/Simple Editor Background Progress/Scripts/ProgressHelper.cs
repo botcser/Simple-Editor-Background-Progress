@@ -13,7 +13,6 @@ namespace Assets.SimpleBackgroundProgress.Scripts
         private int _parentProgressId;
         private IEnumerator _updateProgress;
         private Progress.Status _parentStatus = Progress.Status.Running;
-        private bool _childCancelled;
 
         public ProgressHelper(List<TaskProgressInfo> commandsInfo)
         {
