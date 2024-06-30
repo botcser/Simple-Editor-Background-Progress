@@ -105,11 +105,11 @@ namespace Assets.SimpleBackgroundProgress.Scripts
         {
             for (var i = Progresses.Count - 1; i >= 0; i--)
             {
-                Progresses[i].ReportProgress(); 
-                
-                if (Progresses[i].TaskProgressInfo.Progress != 100) continue;
+                if (i < Progresses.Count) Progresses[i].ReportProgress();
 
-                CloseProgress(Progresses[i], Progress.Status.Succeeded);
+                if (i < Progresses.Count) if (Progresses[i].TaskProgressInfo.Progress < 100) continue;
+
+                if (i < Progresses.Count) CloseProgress(Progresses[i], Progress.Status.Succeeded);
             }
         }
 
